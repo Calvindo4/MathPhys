@@ -12,7 +12,7 @@ public class Ball {
     private double velocityY;
     private Color ballColor;
     private final static double e = 0.9;        // ball's coefficient of resistution
-    private final static double GRAVITY = 0.5;  // use custom gravity
+    private final static double GRAVITY = 0;  // use custom gravity
 
     public Ball(double positionX, double positionY, double radius, double velocityX, double velocityY, Color ballColor) {
         this.radius = radius;
