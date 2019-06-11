@@ -1,4 +1,4 @@
-package Meeting03_Dribble;
+//package Meeting03_Dribble;
 
 import javax.swing.JFrame;
 import java.awt.Color;
@@ -40,6 +40,8 @@ public class Dribble {
         // create the ball
         balls.add(new Ball(300, 200, 50, 10, 10, Color.blue));
         balls.add(new Ball(300, 100, 20, 3, -3, Color.green));
+        balls.add(new Ball(300, 150, 10, 7, 5, Color.red));
+        balls.add(new Ball(300, 250, 15, 13, -6, Color.yellow));
 
         drawingArea = new DrawingArea(frame.getWidth(), frame.getHeight(), balls, walls);
         frame.add(drawingArea);
