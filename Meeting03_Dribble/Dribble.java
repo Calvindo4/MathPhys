@@ -1,9 +1,12 @@
 //package Meeting03_Dribble;
 
-import javax.swing.JFrame;
 import java.awt.Color;
 import java.awt.EventQueue;
+import java.awt.event.*;
+import java.awt.*;
 import java.util.ArrayList;
+import javax.swing.JFrame;
+import javax.swing.*;
 
 /*
     MatFis pertemuan 3
@@ -34,14 +37,115 @@ public class Dribble {
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
+
+        JFrame f = new JFrame("Ball creator & deleter");
+        JLabel posXLabel = new JLabel("Position (X-Axis)");
+        posXLabel.setBounds(10,30,130,30);
+        JLabel posYLabel = new JLabel("Position (Y-Axis)");
+        posYLabel.setBounds(10,70,130,30);
+        JLabel radiusLabel = new JLabel("Radius");
+        radiusLabel.setBounds(10,110,130,30);
+        JLabel velocityXLabel = new JLabel("Velocity (X-axis)");
+        velocityXLabel.setBounds(10,150,130,30);
+        JLabel velocityYLabel = new JLabel("Velocity (Y-axis)");
+        velocityYLabel.setBounds(10,190,130,30);
+        JLabel colorSetLabel = new JLabel("Color");
+        colorSetLabel.setBounds(10,230,130,30);
+
+        f.add(posXLabel);
+        f.add(posYLabel);
+        f.add(radiusLabel);
+        f.add(velocityXLabel);
+        f.add(velocityYLabel);
+        f.add(colorSetLabel);
+
+        JTextField posX = new JTextField();
+        posX.setBounds(130,30,100,30);
+        JTextField posY = new JTextField();
+        posY.setBounds(130,70,100,30);
+        JTextField radius = new JTextField();
+        radius.setBounds(130,110,100,30);
+        JTextField velocityX = new JTextField();
+        velocityX.setBounds(130,150,100,30);
+        JTextField velocityY = new JTextField();
+        velocityY.setBounds(130,190,100,30);
+
+        JTextField colorSet = new JTextField();
+        colorSet.setBounds(130,230,100,30);
+        f.add(posX);
+        f.add(posY);
+        f.add(radius);
+        f.add(velocityX);
+        f.add(velocityY);
+        f.add(colorSet);
+
+        JButton b = new JButton("Create new ball"); //Ball creator
+        b.setBounds(100,300,100,20);    //x axis, y axis, width, height
+
+        JButton kill = new JButton("Delete a ball");  //Ball deleter
+        kill.setBounds(300,300,100,20);
+        kill.addActionListener(new CustomActionListener());
+
+        b.addActionListener(new ActionListener()
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                double ballCounter = balls.size();
+                System.out.println(ballCounter);
+                Color color2 = Color.black;  //Default color
+                double pX = Double.parseDouble(posX.getText());
+                double pY = Double.parseDouble(posY.getText());
+                double r = Double.parseDouble(radius.getText());
+                double vX = Double.parseDouble(velocityX.getText());
+                double vY = Double.parseDouble(velocityY.getText());
+                String col = colorSet.getText();
+                switch(col.toLowerCase())
+                {
+                    case "black":
+                        color2 = Color.black;
+                        break;
+                    case "blue":
+                        color2 = Color.blue;
+                        break;
+                    case "red":
+                        color2 = Color.red;
+                        break;
+                    case "green":
+                        color2 = Color.green;
+                        break;
+                    case "yellow":
+                        color2 = Color.yellow;
+                        break;
+                    case "orange":
+                        color2 = Color.orange;
+                        break;
+                    case "gray":
+                        color2 = Color.gray;
+                        break;
+                }
+                balls.add(new Ball(pX,pY,r,vX,vY,color2));
+            }
+        });
+
+        f.add(b);
+        f.add(kill);
+
+        f.setSize(600,400);
+        f.setLayout(null);
+        f.setVisible(true);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout());
+
         // create the walls
         createWalls();
 
         // create the ball
         balls.add(new Ball(300, 200, 50, 10, 10, Color.blue));
         balls.add(new Ball(300, 100, 20, 3, 3, Color.green));
-        balls.add(new Ball(300, 150, 10, 7, 5, Color.red));
-        balls.add(new Ball(300, 250, 15, 13, 6, Color.yellow));
+        balls.add(new Ball(300, 150, 30, 7, 5, Color.red));
+        balls.add(new Ball(300, 250, 25, 13, 6, Color.yellow));
         balls.add(new Ball(300, 400, 55, 12, 15, Color.black));
 
         drawingArea = new DrawingArea(frame.getWidth(), frame.getHeight(), balls, walls);
@@ -59,6 +163,19 @@ public class Dribble {
         walls.add(new Wall(50, 600, 50, 100, Color.black));  // vertical left
     }
 
+    //ActionListener to delete balls (corresponds to 'kill' button)
+    class CustomActionListener implements ActionListener
+    {
+        @Override
+        public void actionPerformed(ActionEvent e)
+        {
+            int counter = balls.size();
+            if (counter != 0)
+            {
+                balls.remove(counter-1);
+            }
+        }
+    }
     public static void main(String[] args) {
         EventQueue.invokeLater(Dribble::new);
     }
