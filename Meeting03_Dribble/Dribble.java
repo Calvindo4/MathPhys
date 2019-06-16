@@ -28,10 +28,15 @@ public class Dribble {
 
     private ArrayList<Wall> walls = new ArrayList<>();
     private ArrayList<Ball> balls = new ArrayList<>();
+    private ArrayList<Double> corCount = new ArrayList<>();
+
+    double cor = 0.7;
+    double newCor;
 
     public Dribble() {
         //configure the main canvas
         frame = new JFrame("Dribbling Balls");
+
         frame.setExtendedState(JFrame.MAXIMIZED_BOTH);
         frame.setBackground(Color.WHITE);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -70,8 +75,26 @@ public class Dribble {
         JTextField velocityY = new JTextField();
         velocityY.setBounds(130,190,100,30);
 
+        JLabel corLabel = new JLabel("Coefficient of Restitution");
+        corLabel.setBounds(350,30,150,30);
+        f.add(corLabel);
+
+        JLabel info = new JLabel("If empty, COR will remain at 0.9");
+        info.setBounds(430,70,400,50);
+        f.add(info);
+
+        JLabel info2 = new JLabel("COR change will take effect on the next ball");
+        info2.setBounds(403,90,430,50);
+        f.add(info2);
+
+        /* COR field */
+        JTextField corValue = new JTextField();
+        corValue.setBounds(550,30,100,30);
+        f.add(corValue);
+
         JTextField colorSet = new JTextField();
         colorSet.setBounds(130,230,100,30);
+
         f.add(posX);
         f.add(posY);
         f.add(radius);
@@ -91,6 +114,19 @@ public class Dribble {
             @Override
             public void actionPerformed(ActionEvent e)
             {
+                System.out.println(corValue.getText().isEmpty());   //Check if the COR field is empty or not (returns true if empty)
+                
+                //If not empty
+                if (corValue.getText().isEmpty() == false)
+                {
+                    newCor = Double.parseDouble(corValue.getText());    //Parse COR text field content into double
+                    //If COR is different than the original (0.7) and satisfies additional constraints below
+                    if (newCor != 0.7 && newCor >= 0.0 && newCor <= 100.0)
+                    {
+                        cor = newCor;   //Replace current COR with the new COR
+                    }
+                }
+
                 double ballCounter = balls.size();
                 System.out.println(ballCounter);
                 Color color2 = Color.black;  //Default color
@@ -124,7 +160,7 @@ public class Dribble {
                         color2 = Color.gray;
                         break;
                 }
-                balls.add(new Ball(pX,pY,r,vX,vY,color2));
+                balls.add(new Ball(pX,pY,r,vX,vY,cor,color2));
             }
         });
 
@@ -142,11 +178,11 @@ public class Dribble {
         createWalls();
 
         // create the ball
-        balls.add(new Ball(300, 200, 50, 10, 10, Color.blue));
-        balls.add(new Ball(300, 100, 20, 3, 3, Color.green));
-        balls.add(new Ball(300, 150, 30, 7, 5, Color.red));
-        balls.add(new Ball(300, 250, 25, 13, 6, Color.yellow));
-        balls.add(new Ball(300, 400, 55, 12, 15, Color.black));
+        balls.add(new Ball(300, 200, 50, 10, 10, cor, Color.blue));
+        balls.add(new Ball(300, 100, 20, 3, 3, cor, Color.green));
+        balls.add(new Ball(300, 150, 30, 7, 5, cor, Color.red));
+        balls.add(new Ball(300, 250, 25, 13, 6, cor, Color.yellow));
+        balls.add(new Ball(300, 400, 55, 12, 15, cor, Color.black));
 
         drawingArea = new DrawingArea(frame.getWidth(), frame.getHeight(), balls, walls);
         frame.add(drawingArea);

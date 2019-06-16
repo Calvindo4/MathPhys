@@ -3,6 +3,7 @@
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.ArrayList;
+import javax.swing.*;
 
 public class Ball {
     private double positionX;                   // center of ball's position
@@ -11,15 +12,22 @@ public class Ball {
     private double velocityX;                   // ball's velocity
     private double velocityY;
     private Color ballColor;
-    private final static double e = 0.9;        // ball's coefficient of resistution
+    private double e = 0.9;        // ball's coefficient of resistution
     private final static double GRAVITY = 0;  // use custom gravity
 
-    public Ball(double positionX, double positionY, double radius, double velocityX, double velocityY, Color ballColor) {
+    public void ChangeCor(double corValue)
+    {
+        e = corValue;
+        return;
+    }
+
+    public Ball(double positionX, double positionY, double radius, double velocityX, double velocityY, double coefficient, Color ballColor) {
         this.radius = radius;
         this.positionX = positionX;
         this.positionY = positionY;
         this.velocityX = velocityX;
         this.velocityY = velocityY;
+        this.e = coefficient;   //Every ball now has their own COR
         this.ballColor = ballColor;
     }
 
