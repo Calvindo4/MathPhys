@@ -33,6 +33,11 @@ public class Dribble {
     double cor = 0.7;
     double newCor;
 
+    int customStartX;
+    int customStartY;
+    int customEndX;
+    int customEndY;
+    
     public Dribble() {
         //configure the main canvas
         frame = new JFrame("Dribbling Balls");
@@ -105,6 +110,10 @@ public class Dribble {
         JButton b = new JButton("Create new ball"); //Ball creator
         b.setBounds(100,300,100,20);    //x axis, y axis, width, height
 
+        JButton def = new JButton("Spawn default balls");
+        def.setBounds(420,300,200,20);
+        def.addActionListener(new DefaultSpawn());
+
         JButton kill = new JButton("Delete a ball");  //Ball deleter
         kill.setBounds(300,300,100,20);
         kill.addActionListener(new CustomActionListener());
@@ -166,8 +175,9 @@ public class Dribble {
 
         f.add(b);
         f.add(kill);
+        f.add(def);
 
-        f.setSize(600,400);
+        f.setSize(700,400);
         f.setLayout(null);
         f.setVisible(true);
 
@@ -177,42 +187,140 @@ public class Dribble {
         // create the walls
         createWalls();
 
-        // create the ball
-        balls.add(new Ball(300, 200, 50, 10, 10, cor, Color.blue));
-        balls.add(new Ball(300, 100, 20, 3, 3, cor, Color.green));
-        balls.add(new Ball(300, 150, 30, 7, 5, cor, Color.red));
-        balls.add(new Ball(300, 250, 25, 13, 6, cor, Color.yellow));
-        balls.add(new Ball(300, 400, 55, 12, 15, cor, Color.black));
-
         drawingArea = new DrawingArea(frame.getWidth(), frame.getHeight(), balls, walls);
         frame.add(drawingArea);
         drawingArea.start();
     }
-
-    private void createWalls() {
-        // vertical wall must be defined in clockwise direction
-        // horizontal wall must be defined in counter clockwise direction
-
-        walls.add(new Wall(1300, 100, 50, 100, Color.black));	// horizontal top
-        walls.add(new Wall(50, 600, 1300, 600, Color.black));  // horizontal bottom
-        walls.add(new Wall(1300, 100, 1300, 600, Color.black));  // vertical right
-        walls.add(new Wall(50, 600, 50, 100, Color.black));  // vertical left
-    }
-
-    //ActionListener to delete balls (corresponds to 'kill' button)
-    class CustomActionListener implements ActionListener
-    {
-        @Override
-        public void actionPerformed(ActionEvent e)
-        {
-            int counter = balls.size();
-            if (counter != 0)
+        private void createWalls() {
+            // vertical wall must be defined in clockwise direction
+            // horizontal wall must be defined in counter clockwise direction
+            //(startX,startY,endX,endY,color)
+            
+            //Create new window for wall creation
+            JFrame wallNew = new JFrame("Wall creator");
+    
+            JLabel startXLabel = new JLabel("Starting X");
+            startXLabel.setBounds(30,10,100,30);
+            JTextField startX = new JTextField();
+            startX.setBounds (130,10,100,30);
+    
+            JLabel startYLabel = new JLabel("Starting Y");
+            startYLabel.setBounds(30,40,100,30);
+            JTextField startY = new JTextField();
+            startY.setBounds(130,40,100,30);
+    
+            JLabel endXLabel = new JLabel("End X");
+            endXLabel.setBounds(30,70,100,30);
+            JTextField endX = new JTextField();
+            endX.setBounds(130,70,100,30);
+    
+            JLabel endYLabel = new JLabel("End Y");
+            endYLabel.setBounds(30,100,100,30);
+            JTextField endY = new JTextField();
+            endY.setBounds(130,100,100,30);
+    
+            JButton defaultWall = new JButton("Default wall");
+            defaultWall.setBounds(300,20,150,30);
+            defaultWall.addActionListener(new DefaultListener());
+    
+            JButton wallKiller = new JButton("Remove wall");
+            wallKiller.setBounds(300,67,150,30);
+            wallKiller.addActionListener(new wallRemover());
+    
+            JButton newWall = new JButton("Create wall");
+            newWall.setBounds(50,150,150,30);
+            
+            //Listener to create a new wall
+            newWall.addActionListener(new ActionListener()
             {
-                balls.remove(counter-1);
+                @Override
+                public void actionPerformed(ActionEvent e)
+                {
+                    //Get string data from JTextField and parse them as an integer
+                    customStartX = Integer.parseInt(startX.getText());
+                    customStartY = Integer.parseInt(startY.getText());
+                    customEndX = Integer.parseInt(endX.getText());
+                    customEndY = Integer.parseInt(endY.getText());
+    
+                    walls.add(new Wall(customStartX,customStartY,customEndX,customEndY,Color.black));   //Create wall
+                }
+            });
+    
+            
+            wallNew.add(startXLabel);
+            wallNew.add(startX);
+            wallNew.add(startYLabel);
+            wallNew.add(startY);
+            wallNew.add(endXLabel);
+            wallNew.add(endX);
+            wallNew.add(endYLabel);
+            wallNew.add(endY);
+    
+            wallNew.add(defaultWall);
+            wallNew.add(wallKiller);
+            wallNew.add(newWall);
+            wallNew.setSize(640,350);
+            wallNew.setLayout(null);
+            wallNew.setVisible(true);
+        }
+    
+        //ActionListener to kill balls (corresponds to 'kill' button)
+        class CustomActionListener implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                int counter = balls.size();
+                if (counter != 0)
+                {
+                    balls.remove(counter-1);
+                }
             }
         }
+    
+        //Listener to spawn default walls (rectangle)
+        class DefaultListener implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                walls.add(new Wall(1300, 100, 50, 100, Color.black));	// horizontal top
+                walls.add(new Wall(50, 600, 1300, 600, Color.black));  // horizontal bottom
+                walls.add(new Wall(1300, 100, 1300, 600, Color.black));  // vertical right
+                walls.add(new Wall(50, 600, 50, 100, Color.black));  // vertical left
+            }
+        }
+        
+        //Listener to generate default balls
+        class DefaultSpawn implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                // create the ball
+                balls.add(new Ball(300, 200, 50, 10, 10, cor, Color.blue));
+                balls.add(new Ball(300, 100, 20, 3, 3, cor, Color.green));
+                balls.add(new Ball(300, 150, 30, 7, 5, cor, Color.red));
+                balls.add(new Ball(300, 250, 25, 13, 6, cor, Color.yellow));
+                balls.add(new Ball(300, 400, 55, 12, 15, cor, Color.black));
+            }
+        }
+    
+        //Listener to remove a wall
+        class wallRemover implements ActionListener
+        {
+            @Override
+            public void actionPerformed(ActionEvent e)
+            {
+                int counter = walls.size();
+                if (counter != 0)
+                {
+                    walls.remove(counter-1);
+                }
+            }
+        }
+    
+        public static void main(String[] args) {
+            EventQueue.invokeLater(Dribble::new);
+        }
     }
-    public static void main(String[] args) {
-        EventQueue.invokeLater(Dribble::new);
-    }
-}

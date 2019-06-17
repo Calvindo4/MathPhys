@@ -13,6 +13,7 @@ public class Ball {
     private double velocityY;
     private Color ballColor;
     private double e = 0.9;        // ball's coefficient of resistution
+    private final static double a = 0.005;
     private final static double GRAVITY = 0;  // use custom gravity
 
     public void ChangeCor(double corValue)
@@ -43,7 +44,12 @@ public class Ball {
     public void move() {
         positionX += velocityX;
         positionY -= (velocityY + GRAVITY/2);
-        velocityY -= GRAVITY;
+        double velocity = Math.sqrt(velocityX * velocityX + velocityY * velocityY);
+
+        if (velocity > 0){
+            velocityX -= a;
+            velocityY -= a;
+        }
     }
 
     // check collision between walls and the ball
