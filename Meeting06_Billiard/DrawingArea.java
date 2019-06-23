@@ -14,18 +14,24 @@ public class DrawingArea extends JPanel {
     private boolean press = false;
     private int height;
     private int width;
+    private Ball hitter;
+    private Line2D guideline;
+    private Vector destination;
     private ArrayList<Ball> balls;
     private ArrayList<Wall> walls;
     private Thread animator;
     private BufferedImage drawingArea;
 
-    public DrawingArea(int width, int height, ArrayList<Ball> balls, ArrayList<Wall> walls) {
+    public DrawingArea(int width, int height, ArrayList<Ball> balls, ArrayList<Wall> walls, int hitterIndex, Vector destination) {
         super(null);
         this.height = height;
         this.width = width;
         setBounds(0, 0, width, height);
         this.balls = balls;
         this.walls = walls;
+        hitter = balls.get(hitterIndex);
+        this.destination = destination;
+        guideline = new Line2D.Double(hitter.getPositionX(), hitter.getPositionY(), destination.getX(), destination.getY());
 
         animator = new Thread(this::eventLoop);
     }
@@ -73,6 +79,7 @@ public class DrawingArea extends JPanel {
         {
             b.move();
         }
+        guideline.setLine(hitter.getPositionX(), hitter.getPositionY(), destination.getX(), destination.getY());
     }
 
     private void render()
@@ -92,6 +99,12 @@ public class DrawingArea extends JPanel {
 
             for(Wall w : walls) {
                 w.draw(g);
+            }
+
+            if (guideline != null)
+            {
+                g.setColor(Color.red);
+                g.drawLine((int) guideline.getX1(), (int) guideline.getY1(), (int) guideline.getX2(), (int) guideline.getY2());
             }
 
         }

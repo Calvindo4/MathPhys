@@ -70,17 +70,4 @@ public class Ball {
 		double distanceY = this.positionY - other.getPositionY();
 		return Math.sqrt(distanceX * distanceX + distanceY * distanceY);
     }
-    
-    public void createBalls(double x, double cy) {
-        double y;
-        for (int i = 0; i <= 5; i++) {
-            y = cy;
-            x = x+(Ball.RADIUS*Math.sqrt(3.0));
-            y = y-(i-1)*Ball.Radius;
-            for (int j = 0; j < i; j++) {
-                balls.add(New.Ball(x,y,Color.blue));
-                y = y+(2*Ball.RADIUS);
-            }
-        }
-    }
 }

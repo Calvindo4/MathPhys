@@ -18,6 +18,9 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.lang.Math;
 
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.JFrame;
 
 public class Billiard {
@@ -27,6 +30,9 @@ public class Billiard {
 	//The collections of walls to be drawn
 	private ArrayList<Wall> walls = new ArrayList<>();
 	private ArrayList<Ball> balls = new ArrayList<>();
+
+	private Ball hitter;
+	private Vector destination;
 
 	private Billiard() {
 		//configure the main canvas
@@ -40,11 +46,51 @@ public class Billiard {
 
 		createObjects();
 
-		DrawingArea drawingArea = new DrawingArea(frame.getWidth(), frameHeight, balls, walls);
+		hitter = new Ball((frame.getWidth() * 0.66) - 400.0, frame.getHeight() / 2.0, Color.gray);	//Create hitter
+		balls.add(hitter);	//Add hitter to ball array
+		destination = new Vector(hitter.getPositionX(), hitter.getPositionY());		//Get destination coordinates
+
+		DrawingArea drawingArea = new DrawingArea(frame.getWidth(), frameHeight, balls, walls, balls.size() - 1, destination);
 		frame.add(drawingArea);
+
+		//Mouse Listeners
+		frame.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+                drawingArea.setPress(true);
+                destination.setX((double) e.getX());
+                destination.setY((double) e.getY());
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                super.mouseReleased(e);
+
+                double distanceX = e.getX() - hitter.getPositionX();
+                double distanceY = e.getY() - hitter.getPositionY();
+                double distance = Math.sqrt(distanceX * distanceX + distanceY * distanceY);
+
+                hitter.setVelocityX(drawingArea.getTime() * distanceX / distance);
+                hitter.setVelocityY(drawingArea.getTime() * distanceY / distance);
+                //test.setText(Double.toString(hitter.getVelocityX()));
+
+                drawingArea.setPress(false);
+            }
+        });
+
+        frame.addMouseMotionListener(new MouseAdapter() {
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                super.mouseMoved(e);
+                destination.setX((double) e.getX());
+                destination.setY((double) e.getY());
+            }
+        });
 
 		drawingArea.start();
 	}
+
 
 	private void createObjects() {
 		int wallWidth = (int) (frame.getWidth() * 0.9);
@@ -60,25 +106,31 @@ public class Billiard {
 		walls.add(new Wall(wallWidth + wallX, wallHeight + wallY, wallX, wallHeight + wallY));	// right wall
 
 		Random randomGenerator = new Random();
-    
-        double positionX = frame.getWidth() * 0.66;
-        double positionY = frame.getHeight() / 2.0;
+	
+		double x = frame.getWidth() * 0.66;     //Starting x-axis
+		double cy  = frame.getHeight() / 2.0;   //Starting y-axis
+		
+		createBalls(x,cy);
+	}
 
-		Color color = new Color(randomGenerator.nextInt(255), randomGenerator.nextInt(255), randomGenerator.nextInt(255));
-		balls.add(new Ball(500, positionY, color));
-
-        // create new balls
-        for (int i = 1; i <= 5; i++) 
-        {
-            double y = positionY;
-            positionX = positionX + Ball.RADIUS*Math.sqrt(3.0);
-            y = y - (i-1)*Ball.RADIUS;
-            for (int j = 0; j < i; j++) {
-                Color randomColor = new Color(randomGenerator.nextInt(255), randomGenerator.nextInt(255), randomGenerator.nextInt(255));
-                balls.add(new Ball(positionX, y, randomColor));
-                y = y+2*Ball.RADIUS;
-            }			
-        }
+  //Function to create balls
+	public void createBalls(double x, double cy)
+	{
+		double y;
+		Random randomGenerator = new Random();
+		for (int i = 1; i <= 5; i++) 
+		{
+			y = cy;
+			x = x + (Ball.RADIUS * Math.sqrt(3.0));
+			y = y - (i - 1) * Ball.RADIUS;
+			for (int j = 0; j < i; j++)
+			{
+				Color color = new Color(randomGenerator.nextInt(255), randomGenerator.nextInt(255), randomGenerator.nextInt(255));  //Color randomizer
+				balls.add(new Ball(x,y,color));
+				y = y + (2*Ball.RADIUS);
+			}
+		
+		}
 	}
 
 	public static void main(String[] args) {
