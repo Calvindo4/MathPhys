@@ -15,24 +15,24 @@ import javax.swing.JPanel;
 public class GamePlay extends JPanel implements KeyListener, ActionListener{
 	Random randomGenerator = new Random();
 	private boolean play = false;
-	private int score = 0;
+	private double score = 0;
 	
-	private int totalBricks = 28;
-	private int powerUp = 1;
-	private int powerTime = 0;
+	private double totalBricks = 28;
+	private double powerUp = 1;
+	private double powerTime = 0;
 	
 	private Timer timer;
-	private int delay = 3;
+	private double delay = 3;
 	
-	private int playerX = 310;
+	private double playerX = 310;
 	
-	private int ballposX = 350;
-	private int ballposY = 530;
-	private int ballXdir = 1 + randomGenerator.nextInt(2);
-	private int ballYdir = 1 + randomGenerator.nextInt(1);
+	private double ballposX = 350;
+	private double ballposY = 530;
+	private double ballXdir = 1 + randomGenerator.nextInt(2);
+	private double ballYdir = 1 + randomGenerator.nextInt(1);
 
-	private int powerPosX = (540/8 + 50) * (1 + randomGenerator.nextInt(2));
-	private int powerPosY = (200/4 + 50) * (1 + randomGenerator.nextInt(2));
+	private double powerPosX = (540/8 + 120) * (1 + randomGenerator.nextInt(2));
+	private double powerPosY = (200/4 + 60) * (1 + randomGenerator.nextInt(2));
 
 	private MapGenerator map;
 	
@@ -41,7 +41,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 		addKeyListener(this);
 		setFocusable(true);
 		setFocusTraversalKeysEnabled(false);
-		timer = new Timer(delay, this);
+		timer = new Timer((int)delay, this);
 		timer.start();
 	}
 	
@@ -66,26 +66,26 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 		
 		//paddle
 		g.setColor(Color.GREEN);
-		g.fillRect(playerX, 550, 100, 20);
+		g.fillRect((int)playerX, 550, 100, 20);
 		if(powerUp == 0){
-			g.fillRect(playerX, 550, 150, 20);
+			g.fillRect((int)playerX, 550, 150, 20);
 		}
 		else if(powerTime > 100000) {
-			g.fillRect(playerX, 550, 100, 20);
+			g.fillRect((int)playerX, 550, 100, 20);
 		}
 		
 		//ball
 		g.setColor(Color.YELLOW);
-		g.fillOval(ballposX, ballposY, 20, 20);
+		g.fillOval((int)ballposX, (int)ballposY, 20, 20);
 		
 		//powerup
-		g.fillOval(powerPosX, powerPosY, 0, 0);
+		g.fillOval((int)powerPosX, (int)powerPosY, 0, 0);
 		if(score >= 50) {
 			g.setColor(Color.MAGENTA);
-			g.fillOval(powerPosX, powerPosY, 15, 15);
+			g.fillOval((int)powerPosX, (int)powerPosY, 15, 15);
 		}
 		else if(powerUp == 0) {
-			g.fillOval(powerPosX, powerPosY, 0, 0);
+			g.fillOval((int)powerPosX, (int)powerPosY, 0, 0);
 		}
 
 		if(totalBricks <= 0) {
@@ -118,20 +118,17 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		timer.start();
-		Rectangle ballRect = new Rectangle(ballposX, ballposY, 20, 20);
-		Rectangle powerRect = new Rectangle(powerPosX, powerPosY, 0, 0);
-		Rectangle playerRect = new Rectangle(playerX, 550, 110, 20);
+		Rectangle ballRect = new Rectangle((int)ballposX, (int)ballposY, 20, 20);
+		Rectangle powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 0, 0);
+		Rectangle playerRect = new Rectangle((int)playerX, 550, 110, 20);
 		if (powerUp == 0) {
-			playerRect = new Rectangle (playerX, 550, 160, 20);
+			playerRect = new Rectangle ((int)playerX, 550, 160, 20);
 			powerTime++;
-			if(powerTime < 100000) {
-				powerTime ++;
+			if(powerTime > 10) {
+				playerRect = new Rectangle ((int)playerX, 550, 110, 20);
 			}
-			else if(powerTime <= 100000) {
+			else if(powerTime < 10) {
 				powerTime ++;
-			}
-			else if(powerTime > 100000) {
-				playerRect = new Rectangle (playerX, 550, 110, 20);
 			}
 		}
 		if(play) {
@@ -166,20 +163,21 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 						}
 
 						if(score >= 100) {
-						powerRect = new Rectangle(powerPosX, powerPosY, 15, 15);
-							if(powerPosY < 650) {
-								powerPosY ++;
+						powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 15, 15);
+							if(powerPosY <= 650) {
+								powerPosY += 0.05;
 							}
-							else if(powerPosY <= 650) {
-								powerPosY ++;
+							else if(powerUp == 0) {
+								powerPosX = -20;
+								powerPosY = -20;
 							}
 						}
 
 						if(playerRect.intersects(powerRect)) {
 							powerUp = 0;
 							score += 10;
-							powerPosX = -10;
-							powerPosY = -10;
+							powerPosX = -20;
+							powerPosY = -20;
 						}
 					}
 				}
