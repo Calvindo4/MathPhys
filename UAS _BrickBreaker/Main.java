@@ -2,6 +2,7 @@ import javax.swing.JFrame;
 
 public class Main{
 	public static void main(String[] args) {
+		//draw all game properties from GamePlay
 		JFrame frame = new JFrame();
 		GamePlay gameplay = new GamePlay();
 		frame.setBounds(10, 10, 709, 625);

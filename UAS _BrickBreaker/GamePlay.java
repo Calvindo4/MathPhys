@@ -15,25 +15,36 @@ import javax.swing.JPanel;
 public class GamePlay extends JPanel implements KeyListener, ActionListener{
 	Random randomGenerator = new Random();
 	private boolean play = false;
+	//define score
 	private double score = 0;
+
+	//define key hold
+	private double hold = 0;
 	
+	//define total amount of bricks
 	private double totalBricks = 28;
-	private double powerUp = 1;
-	private double powerTime = 0;
 	
+	//define game time flow
 	private Timer timer;
 	private double delay = 3;
 	
+	//define paddle initial location
 	private double playerX = 310;
 	
+	//define ball properties
 	private double ballposX = 350;
 	private double ballposY = 530;
 	private double ballXdir = 1 + randomGenerator.nextInt(2);
 	private double ballYdir = 1 + randomGenerator.nextInt(1);
 
-	private double powerPosX = (540/8 + 120) * (1 + randomGenerator.nextInt(2));
-	private double powerPosY = (200/4 + 60) * (1 + randomGenerator.nextInt(2));
+	//define powerup properties
+	private double powerPosX = (120 + (77 * (1 + randomGenerator.nextInt(6))));
+	private double powerPosY = (70 + (50 * (1 + randomGenerator.nextInt(3))));
+	private double powerUp = 1;
+	private double powerHit = 0;
+	private double powerTime = 0;
 
+	//define map from MapGenerator
 	private MapGenerator map;
 	
 	public GamePlay() {
@@ -46,48 +57,53 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 	}
 	
 	public void paint(Graphics g) {
-		//background
+		//draw background
 		g.setColor(Color.BLACK);
 		g.fillRect(1, 1,  692, 592);
 		
-		//map
+		//draw map
 		map.draw((Graphics2D)g);
 		
-		//borders
+		//draw borders
 		g.setColor(Color.CYAN);
 		g.fillRect(0,  0,  3,  590);
 		g.fillRect(0,  0,  692,  3);
 		g.fillRect(691,  0,  3,  590);
 		
-		//scores
+		//draw score
 		g.setColor(Color.WHITE);
 		g.setFont(new Font("consolas", Font.BOLD, 30));
 		g.drawString("" + score, 590, 30);
 		
-		//paddle
+		//draw paddle
 		g.setColor(Color.GREEN);
 		g.fillRect((int)playerX, 550, 100, 20);
+		//if paddle gets a powerup
 		if(powerUp == 0){
 			g.fillRect((int)playerX, 550, 150, 20);
 		}
+		//if powerup time is over
 		else if(powerTime > 100000) {
 			g.fillRect((int)playerX, 550, 100, 20);
 		}
 		
-		//ball
+		//draw ball
 		g.setColor(Color.YELLOW);
 		g.fillOval((int)ballposX, (int)ballposY, 20, 20);
 		
-		//powerup
+		//draw powerup
 		g.fillOval((int)powerPosX, (int)powerPosY, 0, 0);
-		if(score >= 50) {
-			g.setColor(Color.MAGENTA);
+		//if ball hits a brick with a powerup inside
+		if(powerHit >= 1) {
+			g.setColor(Color.WHITE);
 			g.fillOval((int)powerPosX, (int)powerPosY, 15, 15);
 		}
+		//if powerup is gotten by paddle
 		else if(powerUp == 0) {
 			g.fillOval((int)powerPosX, (int)powerPosY, 0, 0);
 		}
 
+		//game over condition if all bricks are destroyed
 		if(totalBricks <= 0) {
 			play = false;
 			ballXdir = 0;
@@ -100,6 +116,7 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 			g.drawString("Press Enter to restart the game", 170, 350);
 		}
 		
+		//game over condition if paddle miss the ball
 		if(ballposY > 570) {
 			play = false;
 			ballXdir = 0;
@@ -119,23 +136,28 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 	public void actionPerformed(ActionEvent e) {
 		timer.start();
 		Rectangle ballRect = new Rectangle((int)ballposX, (int)ballposY, 20, 20);
-		Rectangle powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 0, 0);
+		Rectangle powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 79, 52);
 		Rectangle playerRect = new Rectangle((int)playerX, 550, 110, 20);
+		//condition if powerup is hit by paddle
 		if (powerUp == 0) {
 			playerRect = new Rectangle ((int)playerX, 550, 160, 20);
 			powerTime++;
-			if(powerTime > 10) {
+			//condition if powerup time is over
+			if(powerTime > 100000) {
 				playerRect = new Rectangle ((int)playerX, 550, 110, 20);
 			}
-			else if(powerTime < 10) {
+			//condition if powerup time is not over
+			else if(powerTime < 100000) {
 				powerTime ++;
 			}
 		}
 		if(play) {
+			//condition if paddle hits ball
 			if(ballRect.intersects(playerRect)) {
 				ballYdir = -ballYdir;
 			}
 			
+			//brick generator from MapGenerator
 		  	A:for(int i = 0; i < map.map.length; i++) {
 				for(int j = 0; j < map.map[0].length; j++) {
 					if(map.map[i][j] > 0) {
@@ -146,7 +168,8 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 
 						Rectangle rect = new Rectangle(brickX, brickY, brickWidth, brickHeight);
 						Rectangle brickRect = rect;
-
+						
+						//condition if ball hits a brick
 						if(ballRect.intersects(brickRect)) {
 							map.setBrickValue(0, i, j);
 							totalBricks--;
@@ -162,19 +185,23 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 							break A;
 						}
 
-						if(score >= 100) {
-						powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 15, 15);
-							if(powerPosY <= 650) {
-								powerPosY += 0.05;
-							}
-							else if(powerUp == 0) {
-								powerPosX = -20;
-								powerPosY = -20;
-							}
+						//condition if ball hits a brick with a powerup inside
+						if(ballRect.intersects(powerRect)) {
+							powerHit = 1;
+						}
+						if(powerHit >= 1) {
+							powerRect = new Rectangle((int)powerPosX, (int)powerPosY, 15, 15);
+							powerPosY += 0.06;
+						}
+						if(powerUp == 0) {
+							powerPosX = -20;
+							powerPosY = -20;
 						}
 
+						//condition if paddle hits a powerup
 						if(playerRect.intersects(powerRect)) {
 							powerUp = 0;
+							powerHit = 0;
 							score += 10;
 							powerPosX = -20;
 							powerPosY = -20;
@@ -204,22 +231,37 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 
 	@Override
 	public void keyPressed(KeyEvent e) {
+		//condition if player press right arrow key
 		if(e.getKeyCode() == KeyEvent.VK_RIGHT) {
 			if(playerX >= 635) {
 				playerX = 635;
+				hold++;
+				if(hold >= 1) {
+					playerX++;
+					moveRight();
+				}
 			}
 			else {
 				moveRight();
+				hold = 0;
 			}
 		}
+		//condition if player press left arrow key
 		if(e.getKeyCode() == KeyEvent.VK_LEFT) {
 			if(playerX < 5) {
 				playerX = 5;
+				hold++;
+				if(hold >= 1) {
+					playerX--;
+					moveLeft();
+				}
 			}
 			else {
 				moveLeft();
+				hold = 0;
 			}
 		}
+		//condition if player press enter after game over
 		if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			if(!play) {
 				play = true;
@@ -227,12 +269,14 @@ public class GamePlay extends JPanel implements KeyListener, ActionListener{
 				ballposY = 530;
 				ballXdir = 1 + randomGenerator.nextInt(2);
 				ballYdir = 1 + randomGenerator.nextInt(1);
-				powerPosX = (540/8 + 50) * (1 + randomGenerator.nextInt(2));
-				powerPosY = (200/4 + 50) * (1 + randomGenerator.nextInt(2));
+				powerPosX = (120 + (77 * (1 + randomGenerator.nextInt(6))));
+				powerPosY = (70 + (50 * (1 + randomGenerator.nextInt(3))));
 				playerX = 310;
 				score = 0;
 				totalBricks = 28;
 				powerUp = 1;
+				powerHit = 0;
+				powerTime = 0;
 				map = new MapGenerator(4, 7);
 				
 				repaint();
