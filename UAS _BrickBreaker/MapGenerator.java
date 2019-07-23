@@ -27,9 +27,9 @@ public class MapGenerator {
 			for(int j = 0; j < map[0].length; j++) {
 				if(map[i][j] > 0) {
 					Color color = new Color(randomGenerator.nextInt(255),randomGenerator.nextInt(255),randomGenerator.nextInt(255));
-					//SWAP CODE COMMENT AT YOUR OWN RISK
-					g.setColor(Color.MAGENTA);
-					//g.setColor(color);
+					//SWAP CODE COMMENT AT YOUR OWN RISK IF YOU REALLY WANT TO KNOW WHAT'S HAPPENING
+					g.setColor(Color.MAGENTA);		//remove comment line 31 and comment line 32 to activate the normal mode 
+					//g.setColor(color);			//remove comment line 32 and comment line 31 to activate the disco mode
 					g.fillRect(j * brickWidth + 88, i * brickHeight + 50, brickWidth, brickHeight);
 					
 					g.setStroke(new BasicStroke());
